@@ -1,0 +1,330 @@
+{% extends 'users/userbase.html' %}
+
+{% block title %}
+    User Home
+{% endblock %}
+
+{% block content %}
+<div class="background-container" style="margin-top: 20px;">
+  <div id="coins-container"></div>
+  <div id="moneybag-coins-container"></div>
+  <div class="form-wrapper" style="align-content: center;">
+    <div class="form-container">
+      <h2>Cryptocurrency Price Prediction</h2>
+
+      <form method="post" class="prediction-form">
+        {% csrf_token %}
+        <input type="number" step="any" name="open" placeholder="Open Price" required class="form-input">
+        <input type="number" step="any" name="high" placeholder="High Price" required class="form-input">
+        <input type="number" step="any" name="low" placeholder="Low Price" required class="form-input">
+        <input type="number" step="any" name="close" placeholder="Close Price" required class="form-input">
+        <input type="number" step="any" name="volume" placeholder="Volume" required class="form-input">
+        <button type="submit" class="submit-button">Predict</button>
+      </form>
+
+      {% if prediction %}
+        <div class="prediction-result">
+          <h3>Predicted Market Cap:</h3>
+          <ul>
+            {% for model, value in prediction.items %}
+              <li><strong>{{ model }}</strong>: {{ value|floatformat:2 }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .background-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url('your-background-image.jpg'); /* Replace with your background image path */
+    background-size: cover;
+    background-position: center;
+  }
+
+  #coins-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5; /* Image coins above background */
+  }
+
+  #moneybag-coins-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 7; /* Money bag emojis above image coins but below form */
+  }
+
+  .coin {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    animation: flow 8s infinite linear, rotate 4s infinite linear;
+    opacity: 0.7;
+  }
+
+  .moneybag-coin {
+    position: absolute;
+    font-size: 32px; /* Slightly larger for visibility */
+    pointer-events: none;
+    transform-style: preserve-3d;
+    animation: flow 8s infinite linear, rotate 4s infinite linear;
+    opacity: 0.95; /* Higher opacity for better visibility */
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6); /* Stronger gold glow */
+    color: #FFD700; /* Gold color for money bag emoji */
+  }
+
+  .bitcoin {
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
+    opacity: 0.85;
+  }
+
+  @keyframes flow {
+    0% {
+      transform: translate(var(--start-x), var(--start-y)) scale(var(--scale)) rotateX(0deg) rotateY(0deg);
+      opacity: 0.7;
+    }
+    50% {
+      transform: translate(calc(var(--start-x) + var(--tx)), calc(var(--start-y) + var(--ty))) scale(var(--scale)) rotateX(var(--rx)) rotateY(var(--ry));
+      opacity: 0.95;
+    }
+    100% {
+      transform: translate(calc(var(--start-x) + var(--tx-end)), calc(var(--start-y) + var(--ty-end))) scale(var(--scale)) rotateX(var(--rx)) rotateY(var(--ry));
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotateY(0deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+
+  .form-wrapper {
+    position: relative;
+    z-index: 10; /* Form above coins and emojis */
+    perspective: 1200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .form-container {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    padding: 40px;
+    border-radius: 20px;
+    width: 360px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    transition: transform 0.8s ease;
+    transform-style: preserve-3d;
+    z-index: 15; /* Explicitly higher z-index for form container */
+  }
+
+  .form-container:hover {
+    transform: rotateY(10deg) rotateX(5deg) scale(1.05);
+  }
+
+  .form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #00f7ff;
+  }
+
+  .prediction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-input {
+    padding: 12px 15px;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    font-size: 1rem;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  }
+
+  .submit-button {
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    background: linear-gradient(to right, #00f7ff, #007cf0);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+    transition: transform 0.3s;
+  }
+
+  .submit-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 255, 255, 0.6);
+  }
+
+  .prediction-result {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px rgba(0, 255, 255, 0.2);
+  }
+
+  .prediction-result h3 {
+    text-align: center;
+    color: #00f7ff;
+  }
+
+  .prediction-result ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  .prediction-result li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .prediction-result li:last-child {
+    border-bottom: none;
+  }
+</style>
+
+<script>
+  const coinsContainer = document.getElementById('coins-container');
+  const moneybagCoinsContainer = document.getElementById('moneybag-coins-container');
+  const coins = [
+    { name: 'bitcoin', url: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png', weight: 0.5 },
+    { name: 'ethereum', url: 'https://cryptologos.cc/logos/ethereum-eth-logo.png', weight: 0.15 },
+    { name: 'ripple', url: 'https://cryptologos.cc/logos/xrp-xrp-logo.png', weight: 0.15 },
+    { name: 'solana', url: 'https://cryptologos.cc/logos/solana-sol-logo.png', weight: 0.15 },
+    { name: 'cardano', url: 'https://cryptologos.cc/logos/cardano-ada-logo.png', weight: 0.15 }
+  ];
+
+  function getRandomCoin() {
+    const rand = Math.random();
+    let cumulative = 0;
+    for (const coin of coins) {
+      cumulative += coin.weight;
+      if (rand <= cumulative) return coin;
+    }
+    return coins[0]; // Fallback to Bitcoin
+  }
+
+  function createCoin(type = 'image') {
+    const container = type === 'moneybag' ? moneybagCoinsContainer : coinsContainer;
+    const coin = document.createElement('div');
+    coin.className = type === 'moneybag' ? 'moneybag-coin' : 'coin';
+    
+    if (type === 'moneybag') {
+      coin.textContent = '💰';
+    } else {
+      const selectedCoin = getRandomCoin();
+      coin.style.backgroundImage = `url(${selectedCoin.url})`;
+      if (selectedCoin.name === 'bitcoin') {
+        coin.classList.add('bitcoin');
+      }
+    }
+    
+    // Randomize size and scale for depth
+    const size = Math.random() * (type === 'moneybag' ? 24 : 40) + (type === 'moneybag' ? 24 : 20); // 24-48px for moneybags, 20-60px for images
+    const scale = 0.5 + (size / (type === 'moneybag' ? 48 : 60)) * 0.5; // Scale between 0.5 and 1
+    if (type !== 'moneybag') {
+      coin.style.width = `${size}px`;
+      coin.style.height = `${size}px`;
+    } else {
+      coin.style.fontSize = `${size}px`;
+    }
+    coin.style.setProperty('--scale', scale);
+
+    // Start coins from bottom-left
+    const startX = -size; // Start off-screen left
+    const startY = window.innerHeight; // Start at bottom
+    coin.style.left = `${startX}px`;
+    coin.style.top = `${startY}px`;
+    coin.style.setProperty('--start-x', `${startX}px`);
+    coin.style.setProperty('--start-y', `${startY}px`);
+
+    // Flow to top-right with slight randomness
+    const tx = window.innerWidth + size + (Math.random() * 100 - 50);
+    const ty = -(window.innerHeight + size + (Math.random() * 100 - 50));
+    const txEnd = tx + (Math.random() * 50 - 25);
+    const tyEnd = ty + (Math.random() * 50 - 25);
+    const rx = Math.random() * 180;
+    const ry = Math.random() * 180;
+    
+    coin.style.setProperty('--tx', `${tx}px`);
+    coin.style.setProperty('--ty', `${ty}px`);
+    coin.style.setProperty('--tx-end', `${txEnd}px`);
+    coin.style.setProperty('--ty-end', `${tyEnd}px`);
+    coin.style.setProperty('--rx', `${rx}deg`);
+    coin.style.setProperty('--ry', `${ry}deg`);
+
+    // Randomize animation duration
+    const duration = Math.random() * 4 + 4; // 4s to 8s
+    coin.style.animationDuration = `${duration}s, 4s`;
+
+    container.appendChild(coin);
+
+    // Remove coin after animation
+    setTimeout(() => {
+      coin.remove();
+    }, duration * 1000);
+  }
+
+  // Create coins and money bag emojis at intervals
+  function spawnCoins() {
+    createCoin('image');
+    if (Math.random() < 0.5) { // Spawn moneybag emojis less frequently
+      createCoin('moneybag');
+    }
+    setTimeout(spawnCoins, Math.random() * 400 + 300); // Spawn every 0.3-0.7s
+  }
+
+  // Start spawning coins and money bag emojis
+  spawnCoins();
+
+  // Adjust positions on window resize
+  window.addEventListener('resize', () => {
+    const allCoins = document.querySelectorAll('.coin, .moneybag-coin');
+    allCoins.forEach(coin => {
+      const size = coin.classList.contains('moneybag-coin') ? parseFloat(coin.style.fontSize) : parseFloat(coin.style.width);
+      const maxX = window.innerWidth - size;
+      const maxY = window.innerHeight - size;
+      const currentX = parseFloat(coin.style.left);
+      const currentY = parseFloat(coin.style.top);
+      coin.style.left = `${Math.min(Math.max(currentX, -size), maxX)}px`;
+      coin.style.top = `${Math.min(Math.max(currentY, -size), maxY)}px`;
+    });
+  });
+</script>
+{% endblock %}

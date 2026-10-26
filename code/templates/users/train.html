@@ -1,0 +1,65 @@
+{% extends 'users/userbase.html' %}
+
+{% block title %}
+    User Home
+{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Train Models - Crypto Market Cap</title>
+    <style>
+       
+        h1 {
+            color: #04e5fe7b;
+        }
+        form {
+            margin: 20px auto;
+        }
+        button {
+            background: #02f2fe;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #000;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        table {
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: #2b2b3c;
+            width: 80%;
+        }
+        th, td {
+            padding: 12px 20px;
+            border: 1px solid #444;
+        }
+        th {
+            background: #00d8fe;
+            color: #000;
+        }
+        td {
+            color: #eee;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #00bfff;
+        }
+        .error {
+            color: red;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Train Crypto Market Cap Models</h1>
+{{metrics|safe}}
+</body>
+</html>
+{% endblock %}
+
